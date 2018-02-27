@@ -29,7 +29,7 @@ class BayesNet(object):
 					print("Sintax error in line", lineCounter)
 					return False
 
-		bayesDescription = list(map(lambda x: x.strip(), bayesDescription))
+		bayesDescription = map(lambda x: x.strip(), bayesDescription)
 
 		bayesNet = {}
 
@@ -52,12 +52,12 @@ class BayesNet(object):
 					if subject not in bayesNet:
 						bayesNet[subject] = {
 							"probabilities": {
-								tuple(sorted(tuple(singleEvidences))): probability
+								tuple(sorted(singleEvidences)): probability
 							},
 							"childs": set()
 						}
 					else:
-						bayesNet[subject]["probabilities"][tuple(sorted(tuple(singleEvidences)))] = probability
+						bayesNet[subject]["probabilities"][tuple(sorted(singleEvidences))] = probability
 				else:
 					print("This description is not neccesary:", description)
 			else:
@@ -114,9 +114,9 @@ class BayesNet(object):
 		else:
 			combinations = iterationSet[0]
 			for i in range(len(iterationSet)-1):
-				combinations = list(product(combinations, iterationSet[i+1]))
+				combinations = product(combinations, iterationSet[i+1])
 
-		totalizedQuery = list(map(lambda x: self.totalInjector(tempQueryFactor, x), combinations))
+		totalizedQuery = map(lambda x: self.totalInjector(tempQueryFactor, x), combinations)
 		totalizedQuery = " + ".join(totalizedQuery)
 		return totalizedQuery
 
@@ -197,54 +197,54 @@ class BayesNet(object):
 			numerator = numerator.split(" + ")
 			denominator = denominator.split(" + ")
 
-			numeratorByFactors = list(map(lambda x: x.split(" * "), numerator))
-			denominatorByFactors = list(map(lambda x: x.split(" * "), denominator))
+			numeratorByFactors = map(lambda x: x.split(" * "), numerator)
+			denominatorByFactors = map(lambda x: x.split(" * "), denominator)
 
 
-			numeratorValue = list(map(
-				lambda x: list(map(
+			numeratorValue = map(
+				lambda x: map(
 					lambda y: self.evaluateCompressedSingle(y),
 					x
-				)),
+				),
 				numeratorByFactors
-			))
+			)
 
-			denominatorValue = list(map(
-				lambda x: list(map(
+			denominatorValue = map(
+				lambda x: map(
 					lambda y: self.evaluateCompressedSingle(y),
 					x
-				)),
+				),
 				denominatorByFactors
-			))
+			)
 
-			numeratorValue = sum(list(map(
+			numeratorValue = sum(map(
 				lambda x: reduce(mul, x),
 				numeratorValue
-			)))
+			))
 
-			denominatorValue = sum(list(map(
+			denominatorValue = sum(map(
 				lambda x: reduce(mul, x),
 				denominatorValue
-			)))
+			))
 
 			return numeratorValue/denominatorValue
 		else:
 			numerator = compressedQuery.split(" + ")
 
-			numeratorByFactors = list(map(lambda x: x.split(" * "), numerator))
+			numeratorByFactors = map(lambda x: x.split(" * "), numerator)
 
-			numeratorValue = list(map(
-				lambda x: list(map(
+			numeratorValue = map(
+				lambda x: map(
 					lambda y: self.evaluateCompressedSingle(y),
 					x
-				)),
+				),
 				numeratorByFactors
-			))
+			)
 
-			numeratorValue = sum(list(map(
+			numeratorValue = sum(map(
 				lambda x: reduce(mul, x),
 				numeratorValue
-			)))
+			))
 
 			return numeratorValue
 
@@ -258,7 +258,7 @@ class BayesNet(object):
 		else:
 			allVariables = query.split(", ")
 
-		allVariables = list(map(lambda x: x[1:] if "!" in x else x, allVariables))
+		allVariables = map(lambda x: x[1:] if "!" in x else x, allVariables)
 		for variable in allVariables:
 			if variable not in self.bayesNet:
 				return False
@@ -291,24 +291,24 @@ bayesNet.parseBNFile("bayesnet.bn")
 # bayesNet = parseBNFile("bayesnet.bn")
 # bayesNet = parseBNFile("parcialNet.bn")
 # drawBayesNet(bayesNet)
-for i in range(10):
-	print(bayesNet.computeQuery("P(A)"))
-	print(bayesNet.computeQuery("P(A, B)"))
-	print(bayesNet.computeQuery("P(A|B)"))
-	print(bayesNet.computeQuery("P(A|C)"))
-	print(bayesNet.computeQuery("P(C)"))
-	print(bayesNet.computeQuery("P(A|B)"))
-	print(bayesNet.computeQuery("P(C|B)"))
+for i in range(1000):
+	bayesNet.computeQuery("P(A)")
+	bayesNet.computeQuery("P(A, B)")
+	bayesNet.computeQuery("P(A|B)")
+	bayesNet.computeQuery("P(A|C)")
+	bayesNet.computeQuery("P(C)")
+	bayesNet.computeQuery("P(A|B)")
+	bayesNet.computeQuery("P(C|B)")
 
 for i in range(10):
-	print(bayesNet.simulateQuery("P(A)"))
-	print(bayesNet.simulateQuery("P(A, B)"))
-	print(bayesNet.simulateQuery("P(A|B)"))
-	print(bayesNet.simulateQuery("P(A|C)"))
-	print(bayesNet.simulateQuery("P(C)"))
-	print(bayesNet.simulateQuery("P(A|B)"))
-	print(bayesNet.simulateQuery("P(C|B)"))
-
+	bayesNet.simulateQuery("P(A)")
+	bayesNet.simulateQuery("P(A, B)")
+	bayesNet.simulateQuery("P(A|B)")
+	bayesNet.simulateQuery("P(A|C)")
+	bayesNet.simulateQuery("P(C)")
+	bayesNet.simulateQuery("P(A|B)")
+	bayesNet.simulateQuery("P(C|B)")
+print("Finished")
 # while True:
 # 	queryInput = input("Enter your query: ")
 # 	print("Result:", bayesNet.computeQuery(queryInput))
